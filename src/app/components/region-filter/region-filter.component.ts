@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-region-filter',
   templateUrl: './region-filter.component.html',
   styleUrls: ['./region-filter.component.scss']
 })
-export class RegionFilterComponent implements OnInit {
+export class RegionFilterComponent {
 
-  constructor() { }
+  @Output() regionSelected = new EventEmitter<string>();
 
-  ngOnInit(): void {
+  onRegionChange(event: any) {
+    this.regionSelected.emit(event.target.value);
   }
 
 }
