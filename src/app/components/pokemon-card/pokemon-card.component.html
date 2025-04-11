@@ -1,1 +1,11 @@
-<p>pokemon-card works!</p>
+<div class="card text-white" 
+[ngStyle]="{'background-color' : getTypeColor(pokemon.types[0].type.name ) }">
+    <div class="card-body position-relative">
+        <h5 class="card-title">{{ pokemon.name | titlecase }}</h5>
+        <p class="card-text">
+            <span *ngFor="let t of pokemon.types">{{ t.type.name }}</span>
+        </p>
+        <img [src]="pokemon.sprites.front_default" alt="" class="img-fluid">
+        <img src="assets/pokeball.svg" alt="" class="pokeball-icon">
+    </div>
+</div>

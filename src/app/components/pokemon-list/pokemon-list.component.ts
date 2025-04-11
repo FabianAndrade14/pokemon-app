@@ -23,9 +23,20 @@ export class PokemonListComponent {
         const pokemonEntries = pokedex.pokemon_entries;
         const detailUrls = pokemonEntries.map((p: any) => 
           `https://pokeapi.co/api/v2/pokemon/${p.pokemon_species.name}`
-        )
+        );
+        this.pokemonService.getPokemonByUrls(detailUrls.slice(0, 20)).subscribe(data => {
+          this.allPokemon = data;
+          this.filteredPokemon = data;
+        })
       })
     })
+  }
+
+  onSearch( term: string ) {
+    this.searchTerm = term.toLowerCase();
+    this.filteredPokemon = this.allPokemon.filter( p => 
+      p.name.toLowerCase().includes(this.searchTerm)
+    )
   }
 
 }

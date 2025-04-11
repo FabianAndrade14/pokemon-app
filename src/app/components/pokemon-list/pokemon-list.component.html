@@ -1,1 +1,8 @@
-<p>pokemon-list works!</p>
+<app-region-filter (regionSelected)="loadRegion($event)"></app-region-filter>
+<app-search-filter (search)="onSearch($event)"></app-search-filter>
+
+<div class="row mt-3">
+    <div class="col-md-4 mb-3" *ngFor="let pokemon of filteredPokemon">
+        <app-pokemon-card [pokemon]="pokemon"></app-pokemon-card>
+    </div>
+</div>
