@@ -11,10 +11,16 @@ export class PokemonListComponent {
   allPokemon: any[] = [];
   filteredPokemon: any[] = [];
   searchTerm: string = '';
+  isLoading = false;
+
+  // Paginación
+  currentPage: number = 1;
+  itemsPerPage: number = 20;
 
   constructor(private pokemonService: PokemonService) { }
 
   loadRegion(regionId: string) {
+    this.isLoading = true;
     this.pokemonService.getRegion(regionId).subscribe((regionData) => {
       const urls = regionData.pokedexes[0].url;
       fetch(urls)
@@ -27,6 +33,8 @@ export class PokemonListComponent {
         this.pokemonService.getPokemonByUrls(detailUrls.slice(0, 20)).subscribe(data => {
           this.allPokemon = data;
           this.filteredPokemon = data;
+          this.currentPage = 1;
+          this.isLoading = false;
         })
       })
     })
@@ -37,6 +45,20 @@ export class PokemonListComponent {
     this.filteredPokemon = this.allPokemon.filter( p => 
       p.name.toLowerCase().includes(this.searchTerm)
     )
+    this.currentPage = 1;
+  }
+
+  get paginatedPokemon() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredPokemon.slice(start, start + this.itemsPerPage);
+  }
+
+  totalPages(): number {
+    return Math.ceil(this.filteredPokemon.length / this.itemsPerPage);
+  }
+
+  goToPage(page: number) {
+    this.currentPage = page;
   }
 
 }
