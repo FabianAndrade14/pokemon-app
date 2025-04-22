@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PokemonService } from 'src/app/services/pokemon.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { PokemonService } from 'src/app/services/pokemon.service';
   templateUrl: './pokemon-list.component.html',
   styleUrls: ['./pokemon-list.component.scss']
 })
-export class PokemonListComponent {
+export class PokemonListComponent implements OnInit {
 
   allPokemon: any[] = [];
   filteredPokemon: any[] = [];
@@ -19,30 +19,48 @@ export class PokemonListComponent {
 
   constructor(private pokemonService: PokemonService) { }
 
+  ngOnInit(): void {
+    this.loadRegion('1');
+  }
+
   loadRegion(regionId: string) {
     this.isLoading = true;
-    this.pokemonService.getRegion(regionId).subscribe((regionData) => {
-      const urls = regionData.pokedexes[0].url;
-      fetch(urls)
-      .then(res => res.json())
-      .then(pokedex => {
-        const pokemonEntries = pokedex.pokemon_entries;
-        const detailUrls = pokemonEntries.map((p: any) => 
-          `https://pokeapi.co/api/v2/pokemon/${p.pokemon_species.name}`
-        );
-        this.pokemonService.getPokemonByUrls(detailUrls.slice(0, 20)).subscribe(data => {
-          this.allPokemon = data;
-          this.filteredPokemon = data;
-          this.currentPage = 1;
-          this.isLoading = false;
-        })
+    this.pokemonService.getRegion(regionId).subscribe(async (regionData) => {
+      const pokedexUrls = regionData.pokedexes.map((p: any) => p.url);
+
+      const allEntries: any[] = [];
+
+      // Cargar todas las entradas de cada Pokédex
+      for (let url of pokedexUrls) {
+        const res = await fetch(url);
+        const data = await res.json();
+        allEntries.push(...data.pokemon_entries);
+      }
+
+      // Eliminar duplicados por nombre
+      const uniqueEntries = Array.from(
+        new Map(
+          allEntries.map((entry) => [entry.pokemon_species.name, entry])
+        ).values()
+      );
+
+      const detailUrls = uniqueEntries.map(
+        (entry) => `https://pokeapi.co/api/v2/pokemon/${entry.pokemon_species.name}`
+        
+      );
+      console.log(detailUrls)
+      this.pokemonService.getPokemonByUrls(detailUrls).subscribe((data) => {
+        this.allPokemon = data;
+        this.filteredPokemon = data;
+        this.currentPage = 1;
+        this.isLoading = false;
       })
     })
   }
 
-  onSearch( term: string ) {
+  onSearch(term: string) {
     this.searchTerm = term.toLowerCase();
-    this.filteredPokemon = this.allPokemon.filter( p => 
+    this.filteredPokemon = this.allPokemon.filter(p =>
       p.name.toLowerCase().includes(this.searchTerm)
     )
     this.currentPage = 1;

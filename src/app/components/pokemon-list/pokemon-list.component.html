@@ -1,5 +1,7 @@
-<app-region-filter (regionSelected)="loadRegion($event)"></app-region-filter>
-<app-search-filter (search)="onSearch($event)"></app-search-filter>
+<div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+    <app-region-filter (regionSelected)="loadRegion($event)"></app-region-filter>
+    <app-search-filter (search)="onSearch($event)"></app-search-filter>
+</div>
 
 <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center" style="height: 300px;">
     <img src="../../../assets/loader.gif" alt="Cargando Pokémon..." width="150">
